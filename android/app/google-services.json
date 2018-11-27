@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "991209474973",
+    "firebase_url": "https://projet-denshi.firebaseio.com",
+    "project_id": "projet-denshi",
+    "storage_bucket": "projet-denshi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991209474973:android:e8fd82a44aa719fe",
+        "android_client_info": {
+          "package_name": "fr.denshi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991209474973-c99ca3knna0hbjmq35e88a0thoejnve0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj70aCYAlOUXz-lk_67KxMb5LNyNdqDsU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

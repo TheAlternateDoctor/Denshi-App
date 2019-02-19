@@ -1,4 +1,4 @@
-package com.example.denshi;
+package fr.denshi;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

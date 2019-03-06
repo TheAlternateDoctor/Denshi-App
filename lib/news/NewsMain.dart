@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:denshi/utils/MenuTiroir.dart';
 
-class NewsMain extends StatefulWidget{
+class NewsMain extends StatefulWidget {
   NewsMain({Key key, this.title}) : super(key: key);
   final String title;
   @override
@@ -9,13 +9,9 @@ class NewsMain extends StatefulWidget{
 }
 
 class _NewsMainState extends State<NewsMain> {
-  
-  String messagetext = "Denshi off";
-  bool text = false;
 
   void grabNews() {
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -31,64 +27,65 @@ class _NewsMainState extends State<NewsMain> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         leading: IconButton(
-            icon: Icon(Icons.dehaze),
-            onPressed: MenuTiroir.showMenu
-          ),
+            icon: Icon(Icons.dehaze), onPressed: MenuTiroir.showMenu),
         title: Text(widget.title),
       ),
       body: GestureDetector(
-              onVerticalDragEnd: (DragEndDetails details) {
-                    MenuTiroir.showMenu();
-                  },
-              child: Center(
+        onVerticalDragEnd: (DragEndDetails details) {
+          MenuTiroir.showMenu();
+        },
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              messagetext,
-            ),
-            Text(
-              "It works!"
-            ),
-          ],
-        ),
+        child: ListView(padding: EdgeInsets.all(8.0),
+          children: getNews()
+              )
       ),
-            ),
       floatingActionButton: FloatingActionButton(
-        onPressed: seekText,
+        onPressed: launchScanner,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.camera_alt),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  void seekText(){
-    setState(() {
-      if(text == false){
-        messagetext = "Denshi On";
-        text = true;
-      }
-      else{
-        messagetext = "Denshi Off";
-        text = false;
-      }
-    });
+  void launchScanner() {
+    debugPrint("Let's launch the barcode Scanner");
+  }
+
+  List<Widget> getNews(){
+    return <Widget>[
+          Card(
+            child: InkWell(
+              splashColor: Colors.blue.withAlpha(30),
+              onTap: () {/* ... */},
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const ListTile(
+                    leading: Icon(Icons.dns),
+                    title: Text('Le nouveau SSD par Samsung est disponible.'),
+                    subtitle: Text('Cliquez pour voir l\'objet'),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Card(
+            child: InkWell(
+              splashColor: Colors.blue.withAlpha(30),
+              onTap: () {/* ... */},
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const ListTile(
+                    leading: Icon(Icons.dns),
+                    title: Text('Le nouveau GPU par MSI est disponible.'),
+                    subtitle: Text('Cliquez pour voir l\'objet'),
+                  )
+                ],
+              ),
+            ),
+          ),
+    ];
   }
 }

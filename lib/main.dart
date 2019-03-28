@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:denshi/Login/Login.dart';
 
 void main() => runApp(Denshi());
 
@@ -20,7 +21,7 @@ class Denshi extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Startup (title: 'Ecran de connexion'),
     );
   }
 }

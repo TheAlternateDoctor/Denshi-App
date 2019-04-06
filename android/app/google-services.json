@@ -13,27 +13,20 @@
           "package_name": "fr.denshi"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "991209474973-c99ca3knna0hbjmq35e88a0thoejnve0.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyBj70aCYAlOUXz-lk_67KxMb5LNyNdqDsU"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991209474973-c99ca3knna0hbjmq35e88a0thoejnve0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

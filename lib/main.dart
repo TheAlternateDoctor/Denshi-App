@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:denshi/Login/Login.dart';
 import 'package:denshi/news/NewsMain.dart';
+=======
+>>>>>>> parent of 36c73fb... Login et début intégration FB
 
 void main() => runApp(Denshi());
 
@@ -22,7 +25,7 @@ class Denshi extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: Startup (title: 'Ecran de connexion'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

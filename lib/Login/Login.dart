@@ -63,6 +63,15 @@ class _LoginPageState extends State<Startup> {
           children: <Widget>[
             _buildTextFields(),
             _buildButtons(),
+            IconButton(
+            icon: Icon(Icons.volume_up),
+            tooltip: 'Increase volume by 10',
+            onPressed: () {
+              setState(() {
+                _volume += 10;
+              });
+            },
+          )
           ],
         ),
       ),

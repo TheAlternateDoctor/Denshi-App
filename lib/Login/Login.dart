@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Startup extends StatefulWidget {
   Startup({Key key, this.title}) : super(key: key);
@@ -63,6 +64,16 @@ class _LoginPageState extends State<Startup> {
           children: <Widget>[
             _buildTextFields(),
             _buildButtons(),
+            IconButton(
+            icon: Icon(FontAwesomeIcons.facebookF),
+            color: Colors.blue,
+            tooltip: 'Connexion Facebook',
+            onPressed: () {
+              setState(() {
+
+              });
+            },
+          ),
           ],
         ),
       ),

@@ -21,12 +21,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   firebase_core: 0.3.1+1
   firebase_database: ^2.0.2
-<<<<<<< HEAD
-  flutter_facebook_login: 1.2.0
+  flutter_facebook_login: 2.0.0
   font_awesome_flutter: ^8.4.0
-=======
-  flutter_facebook_login: ^1.2.0
->>>>>>> parent of ae05c27... Revert "Revert "Revert of Facebook""
 
 dev_dependencies:
   flutter_test:

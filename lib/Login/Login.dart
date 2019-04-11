@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import "package:firebase_auth/firebase_auth.dart";
+
 
 class Startup extends StatefulWidget {
   Startup({Key key, this.title}) : super(key: key);
@@ -64,21 +67,21 @@ class _LoginPageState extends State<Startup> {
           children: <Widget>[
             _buildTextFields(),
             _buildButtons(),
-            IconButton(
-            icon: Icon(FontAwesomeIcons.facebookF),
+            Ink(
+            decoration: ShapeDecoration(
             color: Colors.blue,
+            shape: CircleBorder(),
+        ),
+            child: IconButton( 
+            icon: Icon(FontAwesomeIcons.facebookF),
+            color: Colors.white,
             tooltip: 'Connexion Facebook',
             onPressed: () {
-              setState(() {
-
-              });
-            },
-          ),
-          ],
-        ),
-      ),
-    );
-  }
+              setState() {}
+            }
+        )
+      )])));}
+           
 
   Widget _buildBar(BuildContext context) {
     return new AppBar(
@@ -166,5 +169,20 @@ class _LoginPageState extends State<Startup> {
     print("The user wants a password reset request sent to $_email");
   }
 
-
 }
+
+  void startFacebookLogin() async {
+  var facebookLogin = new FacebookLogin();
+  var result = await facebookLogin.logInWithReadPermission(['email', 'public_profile']);
+    switch (result.status) {
+        case FacebookLoginStatus.loggedIn:
+          FirebaseAuth.instance.signInWithFacebook(accessToken: result.accessToken.token);
+        break;
+        case FacebookLoginStatus.cancelledByUser:
+          print("Connexion Facebook stoppe par l'utilisateur");
+        break;
+        case FacebookLoginStatus.error:
+          print("Connexion Facebook echoue");    
+        break;
+      }
+    }

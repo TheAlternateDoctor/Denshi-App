@@ -65,7 +65,7 @@ class _LoginPageState extends State<Startup> {
               Ink(
                   decoration: ShapeDecoration(
                     color: Colors.blue,
-                    shape: RoundedRectangleBorder()
+                    shape: CircleBorder()
                   ),
                   child: IconButton(
                       icon: Icon(FontAwesomeIcons.facebookF),

@@ -193,8 +193,9 @@ class _LoginPageState extends State<Startup> {
 
     switch (result.status) {
       case TwitterLoginStatus.loggedIn:
-        final AuthCredential credential = FacebookAuthProvider.getCredential(
-          accessToken: result.session.token,
+        final AuthCredential credential = TwitterAuthProvider.getCredential(
+           authToken: result.session.token,
+           authTokenSecret: result.session.secret
         );
         final FirebaseUser user = await _auth.signInWithCredential(credential);
         assert(user.email != null);

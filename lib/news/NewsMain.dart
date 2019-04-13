@@ -9,6 +9,7 @@ class NewsMain extends StatefulWidget {
 }
 
 class _NewsMainState extends State<NewsMain> {
+	GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
 
   void grabNews() {
     setState(() {});
@@ -23,11 +24,14 @@ class _NewsMainState extends State<NewsMain> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+			key: _scaffoldKey,
+      drawer:MenuTiroir.showMenu(),
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         leading: IconButton(
-            icon: Icon(Icons.dehaze), onPressed: MenuTiroir.showMenu),
+            icon: Icon(Icons.dehaze), onPressed: (){
+              _scaffoldKey.currentState.openDrawer();}),
         title: Text(widget.title),
       ),
       body: GestureDetector(

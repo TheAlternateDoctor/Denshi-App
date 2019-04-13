@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:denshi/Login/Login.dart';
-import 'package:denshi/news/NewsMain.dart';
 
 
 void main() => runApp(Denshi());

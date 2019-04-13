@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
+import 'package:http/http.dart' as http;
+import 'package:denshi/news/NewsMain.dart';
 
 
 class Startup extends StatefulWidget {
@@ -198,7 +202,7 @@ class _LoginPageState extends State<Startup> {
            authTokenSecret: result.session.secret
         );
         final FirebaseUser user = await _auth.signInWithCredential(credential);
-        assert(user.email != null);
+        //assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
@@ -207,6 +211,7 @@ class _LoginPageState extends State<Startup> {
         assert(user.uid == currentUser.uid);
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
         } else {
           print('Failed to sign in with Facebook. ');
         }
@@ -239,6 +244,14 @@ class _LoginPageState extends State<Startup> {
         assert(user.uid == currentUser.uid);
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);
+          var graphResponse = await http.get(
+  'https://graph.facebook.com/v2.12/me?fields=name,picture(200),email&access_token='+result
+  .accessToken.token);
+
+      var profile = json.decode(graphResponse.body);
+      print(profile.toString());
+          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
+      break;
         } else {
           print('Failed to sign in with Facebook. ');
         }

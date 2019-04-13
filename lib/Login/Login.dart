@@ -57,6 +57,7 @@ class _LoginPageState extends State<Startup> {
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
     return new Scaffold(
         appBar: _buildBar(context),
         body: new Container(
@@ -74,8 +75,30 @@ class _LoginPageState extends State<Startup> {
                       color: Colors.white,
                       tooltip: 'Connexion Facebook',
                       onPressed: () {
-                        startFacebookLogin();
+                        startFacebookLogin(_auth);
+                      })),
+
+            Ink(
+                  decoration: ShapeDecoration(
+                    color: Colors.blue[100],
+                    shape: CircleBorder()
+                  ),
+                  child: IconButton(
+                      icon: Icon(FontAwesomeIcons.twitter),
+                      color: Colors.white,
+                      tooltip: 'Connexion Twitter',
+                      onPressed: () {
+                        startTwitterLogin(_auth);
                       }))
+
+
+
+
+
+
+
+
+
             ])));
   }
 
@@ -162,9 +185,8 @@ class _LoginPageState extends State<Startup> {
   }
 }
 
-void startFacebookLogin() async {
+void startFacebookLogin(FirebaseAuth _auth) async {
   var facebookLogin = new FacebookLogin();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   var result = await facebookLogin.logInWithReadPermissions(['email']);
   switch (result.status) {
     case FacebookLoginStatus.loggedIn:
@@ -192,4 +214,26 @@ void startFacebookLogin() async {
       print("Connexion Facebook echoue");
       break;
   }
+
+
+
+  void startTwitterLogin(FirebaseAuth _auth) async {
+  TwitterLogin twitterInstance = new TwitterLogin(
+  consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf"
+);
+
+  final TwitterLoginResult result = await twitterInstance.authorize();
+
+  FirebaseUser user = await _auth.signInWithTwitter(
+     authToken: result.session.token,
+     authTokenSecret: result.session.secret);
+
+  UserInfoDetails userInfoDetails = new UserInfoDetails(
+  Navigator.push(
+  );
+
+ return user;
+  }
+
+
 }

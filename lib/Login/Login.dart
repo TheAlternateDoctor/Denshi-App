@@ -183,57 +183,73 @@ class _LoginPageState extends State<Startup> {
   void _passwordReset() {
     print("The user wants a password reset request sent to $_email");
   }
-}
-
-void startFacebookLogin(FirebaseAuth _auth) async {
-  var facebookLogin = new FacebookLogin();
-  var result = await facebookLogin.logInWithReadPermissions(['email']);
-  switch (result.status) {
-    case FacebookLoginStatus.loggedIn:
-      final AuthCredential credential = FacebookAuthProvider.getCredential(
-        accessToken: result.accessToken.token,
-      );
-      final FirebaseUser user = await _auth.signInWithCredential(credential);
-      assert(user.email != null);
-      assert(user.displayName != null);
-      assert(!user.isAnonymous);
-      assert(await user.getIdToken() != null);
-
-      final FirebaseUser currentUser = await _auth.currentUser();
-      assert(user.uid == currentUser.uid);
-      if (user != null) {
-        print('Successfully signed in with Facebook. ' + user.uid);
-      } else {
-        print('Failed to sign in with Facebook. ');
-      }
-      break;
-    case FacebookLoginStatus.cancelledByUser:
-      print("Connexion Facebook stoppe par l'utilisateur");
-      break;
-    case FacebookLoginStatus.error:
-      print("Connexion Facebook echoue");
-      break;
-  }
-
-
 
   void startTwitterLogin(FirebaseAuth _auth) async {
-  TwitterLogin twitterInstance = new TwitterLogin(
-  consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf"
-);
-
-  final TwitterLoginResult result = await twitterInstance.authorize();
-
-  FirebaseUser user = await _auth.signInWithTwitter(
-     authToken: result.session.token,
-     authTokenSecret: result.session.secret);
-
-  UserInfoDetails userInfoDetails = new UserInfoDetails(
-  Navigator.push(
+    TwitterLogin twitterInstance = new TwitterLogin(
+    consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf"
   );
 
- return user;
+    final TwitterLoginResult result = await twitterInstance.authorize();
+
+    switch (result.status) {
+      case TwitterLoginStatus.loggedIn:
+        final AuthCredential credential = FacebookAuthProvider.getCredential(
+          accessToken: result.session.token,
+        );
+        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        assert(user.email != null);
+        assert(user.displayName != null);
+        assert(!user.isAnonymous);
+        assert(await user.getIdToken() != null);
+
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+        if (user != null) {
+          print('Successfully signed in with Facebook. ' + user.uid);
+        } else {
+          print('Failed to sign in with Facebook. ');
+        }
+        break;
+      case TwitterLoginStatus.cancelledByUser:
+        print("Connexion Twitter stoppe par l'utilisateur");
+        break;
+      case TwitterLoginStatus.error:
+        print("Connexion Twitter echoue");
+        break;
+    }
   }
 
 
+  void startFacebookLogin(FirebaseAuth _auth) async {
+    var facebookLogin = new FacebookLogin();
+    var result = await facebookLogin.logInWithReadPermissions(['email']);
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        final AuthCredential credential = FacebookAuthProvider.getCredential(
+          accessToken: result.accessToken.token,
+        );
+        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        assert(user.email != null);
+        assert(user.displayName != null);
+        assert(!user.isAnonymous);
+        assert(await user.getIdToken() != null);
+
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+        if (user != null) {
+          print('Successfully signed in with Facebook. ' + user.uid);
+        } else {
+          print('Failed to sign in with Facebook. ');
+        }
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        print("Connexion Facebook stoppe par l'utilisateur");
+        break;
+      case FacebookLoginStatus.error:
+        print("Connexion Facebook echoue");
+        break;
+    }
+  }
+
 }
+

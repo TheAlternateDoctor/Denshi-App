@@ -21,7 +21,7 @@ class Denshi extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: NewsMain(title: 'News'),
+      home: Startup(title: 'Ecran de connexion'),
     );
   }
 }

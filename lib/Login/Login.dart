@@ -94,15 +94,6 @@ class _LoginPageState extends State<Startup> {
                       onPressed: () {
                         startTwitterLogin(_auth);
                       }))
-
-
-
-
-
-
-
-
-
             ])));
   }
 

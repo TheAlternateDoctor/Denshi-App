@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -7,6 +6,7 @@ import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 import 'package:http/http.dart' as http;
 import 'package:denshi/news/NewsMain.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 class Startup extends StatefulWidget {
@@ -93,8 +93,22 @@ class _LoginPageState extends State<Startup> {
                       tooltip: 'Connexion Twitter',
                       onPressed: () {
                         startTwitterLogin(_auth);
+                      })),
+                       Ink(
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: CircleBorder()
+                  ),
+                  child: IconButton(
+                      icon: Icon(FontAwesomeIcons.google),
+                      color: Colors.red,
+                      tooltip: 'Connexion Google',
+                      onPressed: () {
+                        startGoogleLogin(_auth);
                       }))
             ])));
+            
+
   }
 
   Widget _buildBar(BuildContext context) {
@@ -181,11 +195,8 @@ class _LoginPageState extends State<Startup> {
 
   void startTwitterLogin(FirebaseAuth _auth) async {
     TwitterLogin twitterInstance = new TwitterLogin(
-    consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf"
-  );
-
+    consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf");
     final TwitterLoginResult result = await twitterInstance.authorize();
-
     switch (result.status) {
       case TwitterLoginStatus.loggedIn:
         final AuthCredential credential = TwitterAuthProvider.getCredential(
@@ -255,6 +266,30 @@ class _LoginPageState extends State<Startup> {
         break;
     }
   }
+      
+  void startGoogleLogin(FirebaseAuth _auth) async {
+    final GoogleSignIn _gSignIn = new GoogleSignIn(scopes: ['email']);
+    
+   GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
+   GoogleSignInAuthentication result =
+     await googleSignInAccount.authentication;
 
-}
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+          idToken: result.idToken,
+          accessToken: result.accessToken
+        );
+        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        //assert(user.email != null);
+        assert(user.displayName != null);
+        assert(!user.isAnonymous);
+        assert(await user.getIdToken() != null);
 
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+        if (user != null) {
+          print('Successfully signed in with Facebook. ' + user.uid);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
+        } else {
+          print('Failed to sign in with Facebook. ');
+        }
+ }}

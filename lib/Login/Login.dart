@@ -70,7 +70,8 @@ class _LoginPageState extends State<Startup> {
               _buildTextFields(),
               _buildButtons(),
             Row(
-              children: <Widget>[  
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[ 
             new VerticalDivider(),
             Ink(
                   decoration: ShapeDecoration(

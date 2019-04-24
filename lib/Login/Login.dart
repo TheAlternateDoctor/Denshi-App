@@ -7,6 +7,7 @@ import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 import 'package:http/http.dart' as http;
 import 'package:denshi/news/NewsMain.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:denshi/utils/global.dart' as globals;
 
 
 class Startup extends StatefulWidget {
@@ -251,11 +252,18 @@ class _LoginPageState extends State<Startup> {
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);
           var graphResponse = await http.get(
-  'https://graph.facebook.com/v2.12/me?fields=name,picture(200),email&access_token='+result
-  .accessToken.token);
+              'https://graph.facebook.com/v2.12/me?fields=name,email&access_token=' +
+                  result.accessToken.token);
 
-      var profile = json.decode(graphResponse.body);
-      print(profile.toString());
+          globals.user = user;
+          globals.isLoggedIn = true;
+          globals.userID = user.uid;
+          globals.profilepic = Image.network(
+              'https://graph.facebook.com/v2.12/me/picture?access_token=' +
+                  result.accessToken.token);
+
+          Iterable facebookIt = json.decode(graphResponse.body).entries;
+          globals.pseudo = facebookIt.first.value;
           Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
       break;
         } else {

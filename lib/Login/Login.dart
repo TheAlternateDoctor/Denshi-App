@@ -69,7 +69,10 @@ class _LoginPageState extends State<Startup> {
             child: new Column(children: <Widget>[
               _buildTextFields(),
               _buildButtons(),
-              Ink(
+            Row(
+              children: <Widget>[  
+            new VerticalDivider(),
+            Ink(
                   decoration: ShapeDecoration(
                     color: Colors.blue,
                     shape: CircleBorder()
@@ -82,6 +85,7 @@ class _LoginPageState extends State<Startup> {
                         startFacebookLogin(_auth);
                       })),
 
+            new VerticalDivider(),
             Ink(
                   decoration: ShapeDecoration(
                     color: Colors.blue[100],
@@ -94,7 +98,8 @@ class _LoginPageState extends State<Startup> {
                       onPressed: () {
                         startTwitterLogin(_auth);
                       })),
-                       Ink(
+            new VerticalDivider(),
+             Ink(
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: CircleBorder()
@@ -106,10 +111,8 @@ class _LoginPageState extends State<Startup> {
                       onPressed: () {
                         startGoogleLogin(_auth);
                       }))
-            ])));
-            
-
-  }
+            ])])));
+    }
 
   Widget _buildBar(BuildContext context) {
     return new AppBar(

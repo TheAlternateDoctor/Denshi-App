@@ -62,7 +62,6 @@ class _LoginPageState extends State<Startup> {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
     return new Scaffold(
         appBar: _buildBar(context),
         body: new Container(
@@ -84,7 +83,7 @@ class _LoginPageState extends State<Startup> {
                       color: Colors.white,
                       tooltip: 'Connexion Facebook',
                       onPressed: () {
-                        startFacebookLogin(_auth);
+                        startFacebookLogin();
                       })),
 
             new VerticalDivider(),
@@ -98,7 +97,7 @@ class _LoginPageState extends State<Startup> {
                       color: Colors.white,
                       tooltip: 'Connexion Twitter',
                       onPressed: () {
-                        startTwitterLogin(_auth);
+                        startTwitterLogin();
                       })),
             new VerticalDivider(),
              Ink(
@@ -111,7 +110,7 @@ class _LoginPageState extends State<Startup> {
                       color: Colors.red,
                       tooltip: 'Connexion Google',
                       onPressed: () {
-                        startGoogleLogin(_auth);
+                        startGoogleLogin();
                       }))
             ])])));
     }
@@ -186,8 +185,18 @@ class _LoginPageState extends State<Startup> {
 
   // These functions can self contain any user auth logic required, they all have access to _email and _password
 
-  void _loginPressed() {
-    print('The user wants to login with $_email and $_password');
+  void _loginPressed() async{
+   try {globals.user = await globals.auth.signInWithEmailAndPassword(email: _email, password: _password);
+    globals.pseudo = _email;  
+    globals.userID = await globals.user.getIdToken();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
+   }catch(ERROR_INVALID_EMAIL){
+     print("Invalid email");
+   }catch(ERROR_WRONG_PASSWORD){
+     print("Invalid pass");
+   }catch(ERROR_USER_NOT_FOUND){
+     print("No user");
+   }
   }
 
   void _createAccountPressed() {
@@ -198,7 +207,7 @@ class _LoginPageState extends State<Startup> {
     print("The user wants a password reset request sent to $_email");
   }
 
-  void startTwitterLogin(FirebaseAuth _auth) async {
+  void startTwitterLogin() async {
     TwitterLogin twitterInstance = new TwitterLogin(
     consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf");
     final TwitterLoginResult result = await twitterInstance.authorize();
@@ -208,13 +217,13 @@ class _LoginPageState extends State<Startup> {
            authToken: result.session.token,
            authTokenSecret: result.session.secret
         );
-        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
         //assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
 
-        final FirebaseUser currentUser = await _auth.currentUser();
+        final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);
@@ -233,7 +242,7 @@ class _LoginPageState extends State<Startup> {
   }
 
 
-  void startFacebookLogin(FirebaseAuth _auth) async {
+  void startFacebookLogin() async {
     var facebookLogin = new FacebookLogin();
     var result = await facebookLogin.logInWithReadPermissions(['email']);
     switch (result.status) {
@@ -241,13 +250,13 @@ class _LoginPageState extends State<Startup> {
         final AuthCredential credential = FacebookAuthProvider.getCredential(
           accessToken: result.accessToken.token,
         );
-        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
         assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
 
-        final FirebaseUser currentUser = await _auth.currentUser();
+        final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);
@@ -279,7 +288,7 @@ class _LoginPageState extends State<Startup> {
     }
   }
       
-  void startGoogleLogin(FirebaseAuth _auth) async {
+  void startGoogleLogin() async {
     final GoogleSignIn _gSignIn = new GoogleSignIn(scopes: ['email']);
     
    GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
@@ -290,13 +299,13 @@ class _LoginPageState extends State<Startup> {
           idToken: result.idToken,
           accessToken: result.accessToken
         );
-        final FirebaseUser user = await _auth.signInWithCredential(credential);
+        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
         //assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
 
-        final FirebaseUser currentUser = await _auth.currentUser();
+        final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
           print('Successfully signed in with Facebook. ' + user.uid);

@@ -13,7 +13,7 @@ class Denshi extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: NewsMain (title: 'Ecran de connexion'),
+      home: Startup (title: 'Ecran de connexion'),
     );
   }
 }

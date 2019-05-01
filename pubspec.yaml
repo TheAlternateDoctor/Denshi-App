@@ -29,6 +29,7 @@ dependencies:
   font_awesome_flutter: ^8.4.0
   cloud_firestore: ^0.9.13
   flutter_launcher_icons: ^0.7.0
+  barcode_scan: ^1.0.0
 
 dev_dependencies:
   flutter_test:

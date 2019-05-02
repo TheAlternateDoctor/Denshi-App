@@ -199,12 +199,21 @@ class _LoginPageState extends State<Startup> {
    }
   }
 
-  void _createAccountPressed() {
-    print('The user wants to create an accoutn with $_email and $_password');
+  void _createAccountPressed() async{
+    try{globals.user = await globals.auth.createUserWithEmailAndPassword(email: _email, password: _password);
+    globals.pseudo = _email;  
+    globals.userID = await globals.user.getIdToken();}
+    catch(ERROR_WEAK_PASSWORD){
+      print("weak password");
+    }catch(ERROR_INVALID_EMAIL){
+      print("invalid email");
+    }catch(ERROR_EMAIL_ALREADY_IN_USE){
+      print("email already used");
+    }
   }
 
-  void _passwordReset() {
-    print("The user wants a password reset request sent to $_email");
+  void _passwordReset() async{
+    await globals.auth.sendPasswordResetEmail (email: _email);
   }
 
   void startTwitterLogin() async {

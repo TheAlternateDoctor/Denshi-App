@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denshi/utils/global.dart' as globals;
+import 'package:denshi/news/NewsMain.dart';
+import 'package:denshi/barcode_scan/Scanner.dart';
 
 class MenuTiroir extends StatefulWidget {
   @override
@@ -23,9 +25,13 @@ class _MenuTiroirState extends State<MenuTiroir> {
       ),
       _buildCategories(context),
       Divider(color: Colors.black),
-      ListTile(title: Text("Actualités"), leading: Icon(Icons.announcement)),
+      ListTile(title: Text("Actualités"), leading: Icon(Icons.announcement), onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));},),
       ListTile(title: Text("Favoris"), leading: Icon(Icons.star)),
-      ListTile(title: Text("Scanner"), leading: Icon(Icons.camera_alt)),
+      ListTile(title: Text("Scanner"), leading: Icon(Icons.camera_alt),
+       onTap: (){
+        String barcode = Scanner.scan();
+        print(barcode);
+       }),
       ListTile(title: Text("Historique"), leading: Icon(Icons.history)),
       ListTile(title: Text("Options"), leading: Icon(Icons.settings),)
     ]));

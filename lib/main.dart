@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Pages/barre_de_recherche.dart';
 import 'package:denshi/news/NewsMain.dart';
 import 'package:denshi/Login/Login.dart';
 

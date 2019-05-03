@@ -273,13 +273,18 @@ class _LoginPageState extends State<Startup> {
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
-        globals.pseudo = user.displayName;
-        globals.profilepic = Image.network(user.photoUrl);
-        globals.userID = await user.getIdToken();
-
         final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
+          var graphResponse = await http.get(
+              'https://api.twitter.com/1.1/users/show.json?user_id=' +
+                  result.session.token);
+                  print(graphResponse);
+          globals.user = user;
+          globals.isLoggedIn = true;
+          globals.userID = user.uid;
+
+          globals.pseudo = json.decode(graphResponse.body)["screen_name"];
           print('Successfully signed in with Twitter. ' + user.uid);
           Navigator.pushReplacement(
               context,
@@ -367,8 +372,11 @@ class _LoginPageState extends State<Startup> {
     final FirebaseUser currentUser = await globals.auth.currentUser();
     assert(user.uid == currentUser.uid);
     if (user != null) {
-      print('Successfully signed in with Facebook. ' + user.uid);
-      Navigator.push(
+      globals.pseudo = user.displayName;
+      globals.profilepic = Image.network(user.photoUrl);
+      globals.userID = await user.getIdToken();
+      print('Successfully signed in with Google ' + user.uid);
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => NewsMain(title: "Actualités")));

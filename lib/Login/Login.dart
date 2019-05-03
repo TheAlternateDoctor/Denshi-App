@@ -276,15 +276,12 @@ class _LoginPageState extends State<Startup> {
         final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
-          var graphResponse = await http.get(
-              'https://api.twitter.com/1.1/users/show.json?user_id=' +
-                  result.session.token);
-                  print(graphResponse);
           globals.user = user;
           globals.isLoggedIn = true;
           globals.userID = user.uid;
+          globals.profilepic = Image.network(user.photoUrl);
 
-          globals.pseudo = json.decode(graphResponse.body)["screen_name"];
+          globals.pseudo = result.session.username;
           print('Successfully signed in with Twitter. ' + user.uid);
           Navigator.pushReplacement(
               context,

@@ -9,3 +9,5 @@ bool isLoggedIn = false;
 Image profilepic = new Image.asset('pictures/NoPicture.png');
 String pseudo = "void";
 String userID = "ioyuqhisd";
+String product;
+bool isBarcode;

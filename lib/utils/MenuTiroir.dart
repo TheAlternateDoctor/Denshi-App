@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denshi/utils/global.dart' as globals;
 import 'package:denshi/news/NewsMain.dart';
+import 'package:denshi/ProductDetail/Details.dart';
 import 'package:denshi/barcode_scan/Scanner.dart';
 
 class MenuTiroir extends StatefulWidget {
@@ -29,8 +30,11 @@ class _MenuTiroirState extends State<MenuTiroir> {
       ListTile(title: Text("Favoris"), leading: Icon(Icons.star)),
       ListTile(title: Text("Scanner"), leading: Icon(Icons.camera_alt),
        onTap: (){
-        String barcode = Scanner.scan();
-        print(barcode);
+        //String barcode = Scanner.scan();
+        String barcode = "730143309226";
+        globals.product = barcode;
+        globals.isBarcode = true;
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit "+barcode)));
        }),
       ListTile(title: Text("Historique"), leading: Icon(Icons.history)),
       ListTile(title: Text("Options"), leading: Icon(Icons.settings),)

@@ -1,11 +1,13 @@
 import 'package:barcode_scan/barcode_scan.dart';
 
 class Scanner{
+    static String barcode;
+
     static String scan(){
-      print(launchScanner().toString());
+      launchScanner();
+      return barcode;
     }
-    static Future launchScanner() async{
-      String  barcode = await BarcodeScanner.scan();
-      return barcode; 
+    static void launchScanner() async{
+      barcode = await BarcodeScanner.scan(); 
     }
 }

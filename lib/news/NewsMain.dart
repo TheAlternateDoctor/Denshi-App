@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:denshi/utils/MenuTiroir.dart';
+import 'package:denshi/utils/global.dart' as globals;
+import 'package:denshi/ProductDetail/Details.dart';
+import 'package:denshi/barcode_scan/Scanner.dart';
 
 class NewsMain extends StatefulWidget {
   NewsMain({Key key, this.title}) : super(key: key);
@@ -42,7 +45,11 @@ class _NewsMainState extends State<NewsMain> {
   }
 
   void launchScanner() {
-    debugPrint("Let's launch the barcode Scanner");
+        //String barcode = Scanner.scan();
+        String barcode = "730143309226";
+        globals.product = barcode;
+        globals.isBarcode = true;
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit "+barcode)));
   }
 
   List<Widget> getNews() {

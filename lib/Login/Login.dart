@@ -274,6 +274,7 @@ class _LoginPageState extends State<Startup> {
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
         globals.pseudo = user.displayName;
+        globals.profilepic = Image.network(user.photoUrl);
         globals.userID = await user.getIdToken();
 
         final FirebaseUser currentUser = await globals.auth.currentUser();

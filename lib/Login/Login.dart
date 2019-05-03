@@ -1,14 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import "package:firebase_auth/firebase_auth.dart";
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 import 'package:http/http.dart' as http;
 import 'package:denshi/news/NewsMain.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:denshi/utils/global.dart' as globals;
-
 
 class Startup extends StatefulWidget {
   Startup({Key key, this.title}) : super(key: key);
@@ -21,14 +21,19 @@ class Startup extends StatefulWidget {
 enum FormType { login, register }
 
 class _LoginPageState extends State<Startup> {
+  BuildContext scaffoldContext;
   final TextEditingController _emailFilter = new TextEditingController();
   final TextEditingController _passwordFilter = new TextEditingController();
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   String _email = "";
   String _password = "";
   FormType _form = FormType
       .login; // our default setting is to login, and we should switch to creating an account when the user chooses to
 
   _LoginPageState() {
+    if (globals.userID == "null") {
+      NewsMain(title: "Actualités");
+    }
     _emailFilter.addListener(_emailListen);
     _passwordFilter.addListener(_passwordListen);
   }
@@ -63,57 +68,54 @@ class _LoginPageState extends State<Startup> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+        key: _scaffoldKey,
         appBar: _buildBar(context),
-        body: new Container(
-            padding: EdgeInsets.all(16.0),
-            child: new Column(children: <Widget>[
-              _buildTextFields(),
-              _buildButtons(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[ 
-            new VerticalDivider(),
-            Ink(
-                  decoration: ShapeDecoration(
-                    color: Colors.blue,
-                    shape: CircleBorder()
-                  ),
-                  child: IconButton(
-                      icon: Icon(FontAwesomeIcons.facebookF),
-                      color: Colors.white,
-                      tooltip: 'Connexion Facebook',
-                      onPressed: () {
-                        startFacebookLogin();
-                      })),
-
-            new VerticalDivider(),
-            Ink(
-                  decoration: ShapeDecoration(
-                    color: Colors.blue[100],
-                    shape: CircleBorder()
-                  ),
-                  child: IconButton(
-                      icon: Icon(FontAwesomeIcons.twitter),
-                      color: Colors.white,
-                      tooltip: 'Connexion Twitter',
-                      onPressed: () {
-                        startTwitterLogin();
-                      })),
-            new VerticalDivider(),
-             Ink(
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: CircleBorder()
-                  ),
-                  child: IconButton(
-                      icon: Icon(FontAwesomeIcons.google),
-                      color: Colors.red,
-                      tooltip: 'Connexion Google',
-                      onPressed: () {
-                        startGoogleLogin();
-                      }))
-            ])])));
-    }
+        body: Builder(builder: (BuildContext context) {
+          return new Container(
+              padding: EdgeInsets.all(16.0),
+              child: new Column(children: <Widget>[
+                _buildTextFields(),
+                _buildButtons(),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new VerticalDivider(),
+                      Ink(
+                          decoration: ShapeDecoration(
+                              color: Colors.blue, shape: CircleBorder()),
+                          child: IconButton(
+                              icon: Icon(FontAwesomeIcons.facebookF),
+                              color: Colors.white,
+                              tooltip: 'Connexion Facebook',
+                              onPressed: () {
+                                startFacebookLogin();
+                              })),
+                      new VerticalDivider(),
+                      Ink(
+                          decoration: ShapeDecoration(
+                              color: Colors.blue[100], shape: CircleBorder()),
+                          child: IconButton(
+                              icon: Icon(FontAwesomeIcons.twitter),
+                              color: Colors.white,
+                              tooltip: 'Connexion Twitter',
+                              onPressed: () {
+                                startTwitterLogin();
+                              })),
+                      new VerticalDivider(),
+                      Ink(
+                          decoration: ShapeDecoration(
+                              color: Colors.white, shape: CircleBorder()),
+                          child: IconButton(
+                              icon: Icon(FontAwesomeIcons.google),
+                              color: Colors.red,
+                              tooltip: 'Connexion Google',
+                              onPressed: () {
+                                startGoogleLogin();
+                              }))
+                    ])
+              ]));
+        }));
+  }
 
   Widget _buildBar(BuildContext context) {
     return new AppBar(
@@ -145,6 +147,7 @@ class _LoginPageState extends State<Startup> {
   }
 
   Widget _buildButtons() {
+    scaffoldContext = context;
     if (_form == FormType.login) {
       return new Container(
         child: new Column(
@@ -160,6 +163,10 @@ class _LoginPageState extends State<Startup> {
             new FlatButton(
               child: new Text('Mot de passe oublié ?'),
               onPressed: _passwordReset,
+            ),
+            new FlatButton(
+              child: new Text('Connexion en anonyme'),
+              onPressed: _anonymousConnect,
             )
           ],
         ),
@@ -169,9 +176,8 @@ class _LoginPageState extends State<Startup> {
         child: new Column(
           children: <Widget>[
             new RaisedButton(
-              child: new Text('Créer un compte'),
-              onPressed: _createAccountPressed,
-            ),
+                child: new Text('Créer un compte'),
+                onPressed: _createAccountPressed),
             new FlatButton(
               child: new Text(
                   'Vous avez un compte ? Cliquez ici pour vous connecter.'),
@@ -185,60 +191,101 @@ class _LoginPageState extends State<Startup> {
 
   // These functions can self contain any user auth logic required, they all have access to _email and _password
 
-  void _loginPressed() async{
-   try {globals.user = await globals.auth.signInWithEmailAndPassword(email: _email, password: _password);
-    globals.pseudo = _email;  
-    globals.userID = await globals.user.getIdToken();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
-   }catch(ERROR_INVALID_EMAIL){
-     print("Invalid email");
-   }catch(ERROR_WRONG_PASSWORD){
-     print("Invalid pass");
-   }catch(ERROR_USER_NOT_FOUND){
-     print("No user");
-   }
-  }
-
-  void _createAccountPressed() async{
-    try{globals.user = await globals.auth.createUserWithEmailAndPassword(email: _email, password: _password);
-    globals.pseudo = _email;  
-    globals.userID = await globals.user.getIdToken();}
-    catch(ERROR_WEAK_PASSWORD){
-      print("weak password");
-    }catch(ERROR_INVALID_EMAIL){
-      print("invalid email");
-    }catch(ERROR_EMAIL_ALREADY_IN_USE){
-      print("email already used");
+  void _loginPressed() async {
+    String errorMessage;
+    try {
+      globals.user = await globals.auth
+          .signInWithEmailAndPassword(email: _email, password: _password);
+      globals.pseudo = _email;
+      globals.userID = await globals.user.getIdToken();
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NewsMain(title: "Actualités")));
+    } catch (e) {
+      if (e.code == "ERROR_WRONG_PASSWORD" || e.code == "ERROR_USER_NOT_FOUND")
+        errorMessage = "L'email ou le mot de passe est incorrect.";
+      else if (e.code == "ERROR_INVALID_EMAIL")
+        errorMessage = "L'adresse email est invalide.";
+      else if (e.code == "ERROR_USER_DISABLED")
+        errorMessage =
+            "L'utilisateur a été désactivé. Veuillez contacter le support à contact@denshi.fr.";
+      else if (e.code == "ERROR_TOO_MANY_REQUESTS")
+        errorMessage =
+            "L'utilisateur a tenté de se connecter trop de fois. Veuillez contacter le support à contact@denshi.fr.";
+      else
+        errorMessage = "Erreur non spécifiée.";
+      _scaffoldKey.currentState
+          .showSnackBar(new SnackBar(content: Text(errorMessage)));
     }
   }
 
-  void _passwordReset() async{
-    await globals.auth.sendPasswordResetEmail (email: _email);
+  void _anonymousConnect() async {
+    globals.user = await globals.auth.signInAnonymously();
+    globals.pseudo = "Anonyme";
+    globals.userID = await globals.user.getIdToken();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
+  }
+
+  void _createAccountPressed() async {
+    String errorMessage;
+    globals.user = await globals.auth
+        .createUserWithEmailAndPassword(email: _email, password: _password)
+        .then((FirebaseUser user) async {
+      user.sendEmailVerification();
+      _scaffoldKey.currentState.showSnackBar(new SnackBar(
+          content: Text("Un email de confirmation vous a été envoyé.")));
+      globals.pseudo = _email;
+      globals.userID = await globals.user.getIdToken();
+    }).catchError((e) {
+      if (e.code == "ERROR_WEAK_PASSWORD")
+        errorMessage =
+            "Le mot de passe est trop court. Il faut un minimum de 6 caractères.";
+      else if (e.code == "ERROR_INVALID_EMAIL")
+        errorMessage = "L'adresse email est invalide.";
+      else if (e.code == "ERROR_EMAIL_ALREADY_IN_USE")
+        errorMessage = "L'adresse email est déjà utilisée.";
+      else
+        errorMessage = "Erreur non spécifiée.";
+      _scaffoldKey.currentState
+          .showSnackBar(new SnackBar(content: Text(errorMessage)));
+    });
+  }
+
+  void _passwordReset() async {
+    await globals.auth.sendPasswordResetEmail(email: _email);
   }
 
   void startTwitterLogin() async {
     TwitterLogin twitterInstance = new TwitterLogin(
-    consumerKey : "99am7WSQPkydFW8pBdJ01XRHY", consumerSecret : "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf");
+        consumerKey: "99am7WSQPkydFW8pBdJ01XRHY",
+        consumerSecret: "VX4wabPEesQ24G18bvcaviSFGO326C8lJvVuuqskscBvjZThqf");
     final TwitterLoginResult result = await twitterInstance.authorize();
     switch (result.status) {
       case TwitterLoginStatus.loggedIn:
         final AuthCredential credential = TwitterAuthProvider.getCredential(
-           authToken: result.session.token,
-           authTokenSecret: result.session.secret
-        );
-        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
+            authToken: result.session.token,
+            authTokenSecret: result.session.secret);
+        final FirebaseUser user =
+            await globals.auth.signInWithCredential(credential);
         //assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
         assert(await user.getIdToken() != null);
+        globals.pseudo = user.displayName;
+        globals.userID = await user.getIdToken();
 
         final FirebaseUser currentUser = await globals.auth.currentUser();
         assert(user.uid == currentUser.uid);
         if (user != null) {
-          print('Successfully signed in with Facebook. ' + user.uid);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
+          print('Successfully signed in with Twitter. ' + user.uid);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NewsMain(title: "Actualités")));
         } else {
-          print('Failed to sign in with Facebook. ');
+          print('Failed to sign in with Twitter. ');
         }
         break;
       case TwitterLoginStatus.cancelledByUser:
@@ -250,7 +297,6 @@ class _LoginPageState extends State<Startup> {
     }
   }
 
-
   void startFacebookLogin() async {
     var facebookLogin = new FacebookLogin();
     var result = await facebookLogin.logInWithReadPermissions(['email']);
@@ -259,7 +305,8 @@ class _LoginPageState extends State<Startup> {
         final AuthCredential credential = FacebookAuthProvider.getCredential(
           accessToken: result.accessToken.token,
         );
-        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
+        final FirebaseUser user =
+            await globals.auth.signInWithCredential(credential);
         assert(user.email != null);
         assert(user.displayName != null);
         assert(!user.isAnonymous);
@@ -282,8 +329,11 @@ class _LoginPageState extends State<Startup> {
 
           Iterable facebookIt = json.decode(graphResponse.body).entries;
           globals.pseudo = facebookIt.first.value;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
-      break;
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NewsMain(title: "Actualités")));
+          break;
         } else {
           print('Failed to sign in with Facebook. ');
         }
@@ -296,30 +346,33 @@ class _LoginPageState extends State<Startup> {
         break;
     }
   }
-      
+
   void startGoogleLogin() async {
     final GoogleSignIn _gSignIn = new GoogleSignIn(scopes: ['email']);
-    
-   GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
-   GoogleSignInAuthentication result =
-     await googleSignInAccount.authentication;
 
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-          idToken: result.idToken,
-          accessToken: result.accessToken
-        );
-        final FirebaseUser user = await globals.auth.signInWithCredential(credential);
-        //assert(user.email != null);
-        assert(user.displayName != null);
-        assert(!user.isAnonymous);
-        assert(await user.getIdToken() != null);
+    GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
+    GoogleSignInAuthentication result =
+        await googleSignInAccount.authentication;
 
-        final FirebaseUser currentUser = await globals.auth.currentUser();
-        assert(user.uid == currentUser.uid);
-        if (user != null) {
-          print('Successfully signed in with Facebook. ' + user.uid);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));
-        } else {
-          print('Failed to sign in with Facebook. ');
-        }
- }}
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+        idToken: result.idToken, accessToken: result.accessToken);
+    final FirebaseUser user =
+        await globals.auth.signInWithCredential(credential);
+    //assert(user.email != null);
+    assert(user.displayName != null);
+    assert(!user.isAnonymous);
+    assert(await user.getIdToken() != null);
+
+    final FirebaseUser currentUser = await globals.auth.currentUser();
+    assert(user.uid == currentUser.uid);
+    if (user != null) {
+      print('Successfully signed in with Facebook. ' + user.uid);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NewsMain(title: "Actualités")));
+    } else {
+      print('Failed to sign in with Facebook. ');
+    }
+  }
+}

@@ -369,8 +369,8 @@ class _LoginPageState extends State<Startup> {
     final FirebaseUser currentUser = await globals.auth.currentUser();
     assert(user.uid == currentUser.uid);
     if (user != null) {
-      globals.pseudo = user.displayName;
-      globals.profilepic = Image.network(user.photoUrl);
+      globals.pseudo = googleSignInAccount.displayName;
+      globals.profilepic = Image.network(googleSignInAccount.photoUrl);
       globals.userID = await user.getIdToken();
       print('Successfully signed in with Google ' + user.uid);
       Navigator.pushReplacement(

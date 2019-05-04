@@ -119,7 +119,7 @@ class _LoginPageState extends State<Startup> {
 
   Widget _buildBar(BuildContext context) {
     return new AppBar(
-      title: new Text("Ecran de Connexion"),
+      title: new Text("Bienvenue sur Denshi"),
       centerTitle: true,
     );
   }

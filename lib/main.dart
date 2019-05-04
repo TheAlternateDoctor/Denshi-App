@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'Pages/barre_de_recherche.dart';
+import 'package:denshi/news/NewsMain.dart';
+import 'package:denshi/Login/Login.dart';
 
 
 void main() => runApp(Denshi());
 
 class Denshi extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: barre_de_recherche(),
+      title: 'Denshi',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Startup (title: 'Ecran de connexion'),
     );
   }
 }

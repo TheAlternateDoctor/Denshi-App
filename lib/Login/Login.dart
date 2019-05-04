@@ -71,10 +71,7 @@ class _LoginPageState extends State<Startup> {
       final FirebaseUser currentUser = await globals.auth.currentUser();
       assert(globals.user.uid == currentUser.uid);
       if (globals.user != null) {
-        globals.pseudo = diskVars.getString("displayName");
-        globals.profilepic = Image.network(diskVars.getString("photoUrl"));
-        globals.userID = await globals.user.getIdToken();
-        globals.authenticationMethod = authMethod;
+        globals.getUserFromDisk();
         print('Successfully signed in ' + globals.user.uid);
         Navigator.pushReplacement(
             context,

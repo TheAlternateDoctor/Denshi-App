@@ -48,8 +48,8 @@ class _NewsMainState extends State<NewsMain> {
         //String barcode = Scanner.scan();
         String barcode = "730143309226";
         globals.product = barcode;
-        globals.isBarcode = true;
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit "+barcode)));
+        bool isBarcode = true;
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit ",produit: barcode,isBarcode: isBarcode,)));
   }
 
   List<Widget> getNews() {

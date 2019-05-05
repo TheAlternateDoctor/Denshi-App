@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denshi/utils/global.dart' as globals;
 import 'package:denshi/news/NewsMain.dart';
+import 'package:denshi/Login/Login.dart';
 import 'package:denshi/ProductDetail/Details.dart';
 import 'package:denshi/barcode_scan/Scanner.dart';
 
@@ -31,10 +32,12 @@ class _MenuTiroirState extends State<MenuTiroir> {
       ListTile(title: Text("Scanner"), leading: Icon(Icons.camera_alt),
        onTap: (){
         //String barcode = Scanner.scan();
-        String barcode = "730143309226";
+        // String barcode = "730143309226";
+        String barcode = "Lenovo ThinkServer HDD 1 to";
         globals.product = barcode;
-        globals.isBarcode = true;
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit "+barcode)));
+        bool isBarcode = false;
+        // globals.isBarcode = true;
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit",produit: barcode,isBarcode: isBarcode,)));
        }),
       ListTile(title: Text("Historique"), leading: Icon(Icons.history)),
       ListTile(title: Text("Options"), leading: Icon(Icons.settings),)

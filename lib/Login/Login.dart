@@ -177,7 +177,6 @@ class _LoginPageState extends State<Startup> {
   }
 
   Widget _buildTextFields() {
-    Container passwordConf;
     if (_form == FormType.register) {
       return new Container(
       child: new Column(

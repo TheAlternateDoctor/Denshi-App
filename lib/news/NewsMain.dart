@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:denshi/utils/MenuTiroir.dart';
 import 'package:denshi/utils/global.dart' as globals;
 import 'package:denshi/ProductDetail/Details.dart';
-import 'package:denshi/barcode_scan/Scanner.dart';
 
 class NewsMain extends StatefulWidget {
   NewsMain({Key key, this.title}) : super(key: key);

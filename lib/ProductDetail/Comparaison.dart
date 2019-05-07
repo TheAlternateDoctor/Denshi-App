@@ -4,16 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:denshi/utils/MenuTiroir.dart';
 
-class Details extends StatefulWidget {
-  Details({Key key, this.title, this.produit, this.compare}) : super(key: key);
+class Comparaison extends StatefulWidget {
+  Comparaison({Key key, this.title, this.produit, this.compare}) : super(key: key);
   final String title;
   final String produit;
   final String compare;
   @override
-  _DetailsState createState() => _DetailsState(produit, compare);
+  _ComparaisonState createState() => _ComparaisonState(produit, compare);
 }
 
-class _DetailsState extends State<Details> {
+class _ComparaisonState extends State<Comparaison> {
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   String nameProduit;
   String nameCompare;
@@ -28,26 +28,26 @@ class _DetailsState extends State<Details> {
   List<Widget> detailsProduit = new List();
   List<Widget> detailsCompare = new List();
 
-  _DetailsState(String name, String compare) {
+  _ComparaisonState(String name, String compare) {
     this.nameProduit = name;
     this.nameCompare = compare;
     detailsProduit = [new CircularProgressIndicator()];
     detailsCompare = [new CircularProgressIndicator()];
     getImage(nameProduit).then((image) => setState(() {
           productImage = image;
-          getChamps().then((champs) => setState(() {
+          getChamps(false,nameProduit).then((champs) => setState(() {
                 this.champs = champs;
-                showDetails().then((details) => setState(() {
+                showDetails(nameProduit).then((details) => setState(() {
                       this.detailsProduit = details;
                     }));
               }));
         }));
     getImage(nameCompare).then((image) => setState(() {
           compareImage = image;
-          getChamps().then((champs) => setState(() {
+          getChamps(true,nameCompare).then((champs) => setState(() {
                 this.champs = champs;
-                showDetails().then((details) => setState(() {
-                      this.detailsProduit = details;
+                showDetails(nameCompare).then((details) => setState(() {
+                      this.detailsCompare = details;
                     }));
               }));
         }));
@@ -69,43 +69,39 @@ class _DetailsState extends State<Details> {
           textAlign: TextAlign.center,
         ),
       ),
-      body: Center(
-          child: ListView(
+      body: Row(
         children: <Widget>[
-          Row(children: <Widget>[
-            Column(children: <Widget>[
+            Flexible(child:Column(children: <Widget>[
               productImage,
-              Expanded(
-                  child: Column(children: <Widget>[
-                Text(nameProduit, style: new TextStyle(fontSize: 25)),
-                Text(prixProduit, style: new TextStyle(fontSize: 20))
-              ])),
+                  Column(children: <Widget>[
+                Text(nameProduit, style: new TextStyle(fontSize: 20),textAlign: TextAlign.center,),
+                Text(prixProduit, style: new TextStyle(fontSize: 17),textAlign: TextAlign.center,)
+              ]),
               Column(
                 children: detailsProduit,
               ),
-            ]),
-            Column(children: <Widget>[
+            ])),
+            VerticalDivider(),
+            Flexible(child:Column(children: <Widget>[
               compareImage,
-              Expanded(
-                  child: Column(children: <Widget>[
-                Text(nameCompare, style: new TextStyle(fontSize: 25)),
-                Text(prixCompare, style: new TextStyle(fontSize: 20))
-              ])),
+                  Column(children: <Widget>[
+                Text(nameCompare, style: new TextStyle(fontSize: 20),textAlign: TextAlign.center,),
+                Text(prixCompare, style: new TextStyle(fontSize: 17),textAlign: TextAlign.center,)
+              ]),
               Column(
                 children: detailsCompare,
               ),
-            ]),
+            ]),)
           ]),
-        ],
-      )),
     );
   }
 
-  Future<List<Widget>> showDetails() async {
+
+  Future<List<Widget>> showDetails(String produitString) async {
     List<Widget> details = new List();
     var produitQuery = await Firestore.instance
         .collection("Produits")
-        .where("Nom", isEqualTo: nameProduit)
+        .where("Nom", isEqualTo: produitString)
         .getDocuments();
     DocumentSnapshot produit = produitQuery.documents[0];
     this.categorie = produit.data["Catégorie"];
@@ -120,31 +116,36 @@ class _DetailsState extends State<Details> {
             champsSpe[y] +
                 " : " +
                 produit.data[champs[i]][champsSpe[y]].toString(),
-            textAlign: TextAlign.left,
+            textAlign: TextAlign.center,
           ));
         }
       } else if (produit.data[champs[i]] == false) {
         details.add(new Text(
           champs[i] + " : Non",
-          textAlign: TextAlign.left,
+          textAlign: TextAlign.center
         ));
       } else {
         details.add(new Text(
           champs[i] + " : " + produit.data[champs[i]].toString(),
-          textAlign: TextAlign.left,
+          textAlign: TextAlign.center,
         ));
       }
     }
     return details;
   }
 
-  Future<List> getChamps() async {
+  Future<List> getChamps(bool isCompare,String nomProduit) async {
     var produit = await Firestore.instance
         .collection("Produits")
-        .where("Nom", isEqualTo: nameProduit)
+        .where("Nom", isEqualTo: nomProduit)
         .getDocuments();
     String categorie = produit.documents[0].data["Catégorie"];
-    this.prixProduit = produit.documents[0].data["Prix_bas"].toString() + "€";
+    if(!isCompare){
+      this.prixProduit = produit.documents[0].data["Prix_bas"].toString() + "€";
+      if(prixProduit.toString() == "null€") prixProduit = produit.documents[0].data["Prix"].toString() + "€";}
+    else{
+      this.prixCompare = produit.documents[0].data["Prix_bas"].toString() + "€";
+      if(prixCompare.toString() == "null€") prixCompare = produit.documents[0].data["Prix"].toString() + "€";}
     var contenu = await Firestore.instance
         .collection("Contenu")
         .where("Nom", isEqualTo: categorie)

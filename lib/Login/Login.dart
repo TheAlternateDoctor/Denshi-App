@@ -372,6 +372,7 @@ class _LoginPageState extends State<Startup> {
           globals.profilepic = Image.network(user.photoUrl);
           globals.photoUrl = user.photoUrl;
           globals.authenticationMethod = "Twitter";
+          globals.signInMethod = twitterInstance;
 
           globals.pseudo = result.session.username;
           globals.addUserToDisk(result.session.token, result.session.secret);
@@ -426,6 +427,7 @@ class _LoginPageState extends State<Startup> {
               'https://graph.facebook.com/v2.12/me/picture?access_token=' +
                   result.accessToken.token;
           globals.authenticationMethod = "Facebook";
+          globals.signInMethod = facebookLogin;
 
           Iterable facebookIt = json.decode(graphResponse.body).entries;
           globals.pseudo = facebookIt.first.value;
@@ -472,6 +474,7 @@ class _LoginPageState extends State<Startup> {
       globals.photoUrl = googleSignInAccount.photoUrl;
       globals.userID = await user.getIdToken();
       globals.authenticationMethod = "Google";
+      globals.signInMethod = _gSignIn;
       globals.addUserToDisk(result.idToken, result.accessToken);
       print('Successfully signed in with Google ' + user.uid);
       Navigator.pushReplacement(

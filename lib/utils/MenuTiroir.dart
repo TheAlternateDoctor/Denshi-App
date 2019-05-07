@@ -1,10 +1,11 @@
+import 'package:denshi/ProductDetail/CategoryViewer.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denshi/utils/global.dart' as globals;
 import 'package:denshi/news/NewsMain.dart';
-import 'package:denshi/Login/Login.dart';
 import 'package:denshi/ProductDetail/Details.dart';
 import 'package:denshi/barcode_scan/Scanner.dart';
+import 'package:denshi/Option/Option.dart';
 
 class MenuTiroir extends StatefulWidget {
   @override
@@ -28,19 +29,15 @@ class _MenuTiroirState extends State<MenuTiroir> {
       _buildCategories(context),
       Divider(color: Colors.black),
       ListTile(title: Text("Actualités"), leading: Icon(Icons.announcement), onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => NewsMain(title: "Actualités")));},),
-      ListTile(title: Text("Favoris"), leading: Icon(Icons.star)),
+      // ListTile(title: Text("Favoris"), leading: Icon(Icons.star)),
       ListTile(title: Text("Scanner"), leading: Icon(Icons.camera_alt),
        onTap: (){
-        //String barcode = Scanner.scan();
-        // String barcode = "730143309226";
-        String barcode = "Lenovo ThinkServer HDD 1 to";
-        globals.product = barcode;
+        String barcode = Scanner.scan();
         bool isBarcode = false;
-        // globals.isBarcode = true;
         Navigator.push(context, MaterialPageRoute(builder: (context) => Details(title: "Détail du produit",produit: barcode,isBarcode: isBarcode,)));
        }),
-      ListTile(title: Text("Historique"), leading: Icon(Icons.history)),
-      ListTile(title: Text("Options"), leading: Icon(Icons.settings),)
+      // ListTile(title: Text("Historique"), leading: Icon(Icons.history)),
+      ListTile(title: Text("Options"), leading: Icon(Icons.settings), onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => Option(title: "Options")));})
     ]));
   }
 
@@ -88,12 +85,20 @@ class _MenuTiroirState extends State<MenuTiroir> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data, double paddingLevel) {
     final record = Record.fromSnapshot(data);
-    if(paddingLevel==null)
+    bool isSousCat;
+    if(paddingLevel==null){
       paddingLevel = 0;
+      isSousCat = false;
+      }
+      else if(paddingLevel == 0.0)
+      isSousCat = false;
+      else
+      isSousCat = true;
     if(record.hasSousCat == false){
     return ListTile(
       contentPadding: EdgeInsets.only(left: paddingLevel*20+15),
-      title: Text(record.name)
+      title: Text(record.name),
+      onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryViewer(title: record.name,categorie: record.name,isSousCat: isSousCat,)));}
     );}
     else{
       return _buildModularCategories(context,record.name,paddingLevel+1);

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:denshi/utils/global.dart' as globals;
 import 'package:denshi/utils/MenuTiroir.dart';
+import 'package:denshi/ProductDetail/Comparaison.dart';
 
 class Details extends StatefulWidget {
   Details({Key key, this.title, this.produit, this.isBarcode})
@@ -17,9 +18,8 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
-  String product = globals.product;
-  bool isBarcode = globals.isBarcode;
-  String name = globals.product;
+  bool isBarcode;
+  String name;
   String prix = "€";
   String categorie;
   Image productImage =
@@ -34,18 +34,23 @@ class _DetailsState extends State<Details> {
     this.isBarcode = isBarcode;
     details = [new CircularProgressIndicator()];
     correspondances = [new CircularProgressIndicator()];
-    getImage(product, isBarcode).then((image) => setState(() {
+    getImage(name, isBarcode).then((image) => setState(() {
           productImage = image;
           getChamps().then((champs) => setState(() {
                 this.champs = champs;
                 showDetails().then((details) => setState(() {
                       this.details = details;
                       getAlternative().then((alternatives) => setState(() {
-                            this.correspondances = alternatives;
-                            if(alternatives.isEmpty){
+                            correspondances = alternatives;
+                            // correspondances = [new LinearProgressIndicator()];
+                            if (alternatives.isEmpty) {
                               correspondances = new List();
-                              correspondances.add(Text("Il n'y a pas de produits similaires pour cette article, veuillez réessayer plus tard.",style: new TextStyle(fontSize: 17),textAlign: TextAlign.center,));
-                              }
+                              correspondances.add(Text(
+                                "Il n'y a pas de produits similaires pour cette article, veuillez réessayer plus tard.",
+                                style: new TextStyle(fontSize: 17),
+                                textAlign: TextAlign.center,
+                              ));
+                            }
                           }));
                     }));
               }));
@@ -82,9 +87,12 @@ class _DetailsState extends State<Details> {
           Column(
             children: details,
           ),
-          Divider(height: 30,),
+          Divider(
+            height: 30,
+          ),
           Center(
-              child: Text("Produits similaires:", style: new TextStyle(fontSize: 20))),
+              child: Text("Produits similaires:",
+                  style: new TextStyle(fontSize: 20))),
           Column(
             children: correspondances,
           ),
@@ -138,6 +146,7 @@ class _DetailsState extends State<Details> {
         .getDocuments();
     String categorie = produit.documents[0].data["Catégorie"];
     this.prix = produit.documents[0].data["Prix_bas"].toString() + "€";
+    if(prix.toString() == "null€") prix = produit.documents[0].data["Prix"].toString() + "€";
     var contenu = await Firestore.instance
         .collection("Contenu")
         .where("Nom", isEqualTo: categorie)
@@ -166,63 +175,106 @@ class _DetailsState extends State<Details> {
         .collection("Produits")
         .where("Catégorie", isEqualTo: categorie)
         .getDocuments();
+    var prodActuel = await Firestore.instance
+        .collection("Produits")
+        .where("Nom", isEqualTo: name)
+        .getDocuments();
+    correspondancesSnapshot.add(prodActuel.documents[0]);
     var alternatives = (await Firestore.instance
             .collection("Alternatives")
             .where("Nom", isEqualTo: categorie)
             .getDocuments())
         .documents[0];
     List<String> altRaison = new List();
-    if(alternatives.data["Alternatives"].length!=0){
-    for (int i = 0; i < alternatives.data["Alternatives"].length; i++) {
-      if (alternatives.data[alternatives.data["Alternatives"][i]] is bool) {
-      } else {
-        if (name.contains(
-            alternatives.data[alternatives.data["Alternatives"][i]][1])){
-          altString
-              .add(alternatives.data[alternatives.data["Alternatives"][i]][2]);
-              altRaison.add(alternatives.data[alternatives.data["Alternatives"][i]][0]);}
-        else if (name.contains(
-            alternatives.data[alternatives.data["Alternatives"][i]][2])){
-          altString
-              .add(alternatives.data[alternatives.data["Alternatives"][i]][1]);
-              altRaison.add(alternatives.data[alternatives.data["Alternatives"][i]][0]);}
+    if (alternatives.data["Alternatives"].length != 0) {
+      for (int i = 0; i < alternatives.data["Alternatives"].length; i++) {
+        if (alternatives.data[alternatives.data["Alternatives"][i]] is bool) {
+        } else {
+          if (name.contains(
+              alternatives.data[alternatives.data["Alternatives"][i]][1])) {
+            altString.add(
+                alternatives.data[alternatives.data["Alternatives"][i]][2]);
+            altRaison.add(
+                alternatives.data[alternatives.data["Alternatives"][i]][0]);
+          } else if (name.contains(
+              alternatives.data[alternatives.data["Alternatives"][i]][2])) {
+            altString.add(
+                alternatives.data[alternatives.data["Alternatives"][i]][1]);
+            altRaison.add(
+                alternatives.data[alternatives.data["Alternatives"][i]][0]);
+          }
+        }
+      }
+      for (int i = 0; i < produits.documents.length; i++) {
+        for (int y = 0; y < altString.length; y++) {
+          if (produits.documents[i].data["Nom"]
+              .contains(
+                  altString[y])) if (!correspondancesSnapshot
+              .contains(produits.documents[i])) {
+            correspondancesSnapshot.add((produits.documents[i]));
+            correspondances
+                .add(await buildAlt(produits.documents[i], altRaison[y]));
+          }
+        }
       }
     }
     for (int i = 0; i < produits.documents.length; i++) {
-      for (int y = 0; y < altString.length; y++) {
-        if (produits.documents[i].data["Nom"].contains(altString[y])) 
-          if (!correspondancesSnapshot.contains(produits.documents[i])){
-            correspondancesSnapshot.add((produits.documents[i]));
-            correspondances.add(await buildAlt(produits.documents[i],altRaison[y]));
-            }
-      }
-    }
-    }
-    for(int i=0;i< produits.documents.length;i++){
       for (int y = 0; y < champs.length; y++) {
         if (produits.documents[i].data[champs[y]] is Map) {
-        List<dynamic> champsSpe = await getChampsMap(champs[i]);
-        for (int w = 0; w < champsSpe.length; w++) {
-          if (produits.documents[i].data[champs[y]][champsSpe[w]].contains(detailsRaw[champs[y]][champsSpe[w]])) 
-            if (!correspondancesSnapshot.contains(produits.documents[i])){
+          List<dynamic> champsSpe = await getChampsMap(champs[y]);
+          for (int w = 0; w < champsSpe.length; w++) {
+            if (produits.documents[i].data[champs[y]][champsSpe[w]] is String) {
+              if (detailsRaw[champs[y]] is String) {
+                if (produits.documents[i].data[champs[y]][champsSpe[w]]
+                    .contains(
+                        detailsRaw[champs[y]])) if (!correspondancesSnapshot
+                    .contains(produits.documents[i])) {
+                  correspondancesSnapshot.add((produits.documents[i]));
+                  correspondances.add(await buildAlt(
+                      produits.documents[i], "Même " + champsSpe[w]));
+                }
+              }
+            } else {
+              if (produits.documents[i].data[champs[y]][champsSpe[w]] ==
+                  detailsRaw[
+                      champs[y]]) if (!correspondancesSnapshot
+                  .contains(produits.documents[i])) {
+                correspondancesSnapshot.add((produits.documents[i]));
+                correspondances.add(await buildAlt(
+                    produits.documents[i], "Même " + champsSpe[w]));
+              }
+            }
+          }
+        } else if (produits.documents[i].data[champs[y]] is String) {
+          if (detailsRaw[champs[y]] is String) {
+            if (produits.documents[i].data[champs[y]]
+                .contains(
+                    detailsRaw[champs[y]])) if (!correspondancesSnapshot
+                .contains(produits.documents[i])) {
               correspondancesSnapshot.add((produits.documents[i]));
-              correspondances.add(await buildAlt(produits.documents[i],"Même "+champsSpe[w]));
+              correspondances.add(
+                  await buildAlt(produits.documents[i], "Même " + champs[y]));
             }
-        }
-      }
-        if (produits.documents[i].data[champs[y]].contains(detailsRaw[champs[y]])) 
-          if (!correspondancesSnapshot.contains(produits.documents[i])){
+          }
+        } else {
+          if (produits.documents[i].data[champs[y]] ==
+              detailsRaw[
+                  champs[y]]) if (!correspondancesSnapshot
+              .contains(produits.documents[i])) {
             correspondancesSnapshot.add((produits.documents[i]));
-            correspondances.add(await buildAlt(produits.documents[i],"Même "+champs[y]));
-            }
+            correspondances.add(
+                await buildAlt(produits.documents[i], "Même " + champs[y]));
+          }
+        }
       }
     }
     return correspondances;
   }
 
-  Future<Card> buildAlt(DocumentSnapshot correspondance,String raison) async {
+  Future<Card> buildAlt(DocumentSnapshot correspondance, String raison) async {
     String nom = correspondance.data["Nom"];
     String prix = correspondance.data["Prix_bas"].toString();
+    if(prix.toString() == "null") prix = correspondance.data["Prix"].toString();
     Image image = await getImageAlt(nom);
     return Card(
       child: InkWell(
@@ -237,13 +289,24 @@ class _DetailsState extends State<Details> {
         child: Column(
           children: <Widget>[
             ListTile(
-              leading: CircleAvatar(
-              backgroundImage: image.image,
-              backgroundColor: Color(0xFFFFFF),
-            ),
-              title: Text(nom),
-              subtitle: Text(prix + "€ | " + raison),
-            )
+                leading: CircleAvatar(
+                  backgroundImage: image.image,
+                  backgroundColor: Color(0xFFFFFF),
+                ),
+                title: Text(nom),
+                subtitle: Text(prix + "€ | " + raison),
+                trailing: FlatButton(
+                  child: Icon(Icons.compare_arrows),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Comparaison(
+                                title: "Comparaison",
+                                produit: name,
+                                compare: nom)));
+                  },
+                )),
           ],
         ),
       ),
@@ -272,6 +335,8 @@ class _DetailsState extends State<Details> {
         .ref()
         .child(name + ".jpg")
         .getDownloadURL();
-    return Image.network(url,);
+    return Image.network(
+      url,
+    );
   }
 }

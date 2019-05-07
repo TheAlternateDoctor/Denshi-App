@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'Pages/barre_de_recherche.dart';
-import 'package:denshi/news/NewsMain.dart';
 import 'package:denshi/Login/Login.dart';
 
 
@@ -14,7 +12,7 @@ class Denshi extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Startup (title: 'Ecran de connexion'),
+      home: Startup (title: 'Bienvenue sur Denshi'),
     );
   }
 }

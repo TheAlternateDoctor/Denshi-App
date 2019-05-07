@@ -13,7 +13,9 @@ String pseudo = "void";
 String userID = "null";
 String product;
 bool isBarcode;
+//Can be email, Google, Twitter, Facebook
 String authenticationMethod = "none";
+var signInMethod;
 
 void addUserToDisk(String authToken, String authToken2) async{
 SharedPreferences disk = await SharedPreferences.getInstance();
@@ -32,4 +34,12 @@ userID = disk.getString("userID");
 authenticationMethod = disk.getString("authMethod");
 isLoggedIn = disk.getBool("isLoggedIn");
 photoUrl = disk.getString("photoUrl");
+}
+
+void wipeDisk() async{
+SharedPreferences disk = await SharedPreferences.getInstance();
+disk.remove("pseudo");
+disk.remove("userID");
+disk.setBool("isLoggedIn",false);
+disk.remove("photoUrl");
 }
